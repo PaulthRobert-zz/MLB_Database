@@ -1,8 +1,9 @@
+USE [MLB]
 DECLARE @SEASON int = 2015
 
 
 SELECT
-	COUNT(*)
+	COUNT(*) AS [Game]
 FROM
 	GAME
 WHERE
@@ -10,7 +11,7 @@ WHERE
 
 
 SELECT
-	COUNT(*)
+	COUNT(*) AS [Pitch]
 FROM
 	(
 	SELECT DISTINCT
