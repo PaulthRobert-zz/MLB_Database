@@ -3,7 +3,11 @@ USE [MLB]
 CREATE TABLE [MLB].[dbo].[Game](
 
 	gameId INT NOT NULL, --This is a way of creating a primary key in tables
-	gameDate DATE NOT NULL
+	gameDate DATE NOT NULL,
+	detailedState VARCHAR(25),
+	reason VARCHAR(25),
+	homeTeam INT,
+	awayTeam INT
 	
 ) ON [PRIMARY] -- this has something to do with where the data is stored - file group
 
