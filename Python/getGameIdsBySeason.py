@@ -84,8 +84,8 @@ def getGames(season, gameType):
 
                     #build sql statement
                     SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Game]"
-                    "(gameId, gameType, gameDate, detailedState, reason, homeTeam, awayTeam)"
-                    f'VALUES ({gameId},\'{gameType}\', \'{gameDate}\', \'{detailedState}\', \'{reason}\', {homeTeam}, {awayTeam})')
+                    "(gameId, season, gameType, gameDate, detailedState, reason, homeTeam, awayTeam, venue)"
+                    f'VALUES ({gameId}, {season}, \'{gameType}\', \'{gameDate}\', \'{detailedState}\', \'{reason}\', {homeTeam}, {awayTeam}, \'{venue}\')')
 
                     #print(SqlInsertStatement)
                     

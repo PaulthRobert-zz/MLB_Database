@@ -1,18 +1,20 @@
 USE [MLB]
 GO
 
+/****** Object:  StoredProcedure [dbo].[LOAD_fact.Season]    Script Date: 8/20/2020 3:03:54 PM ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
 
+
 -- =============================================
 -- Author:		<Paul Davis>
 -- Create date: <08/20/20>
 -- Description:	<Loads the season table with fact values>
 -- =============================================
-CREATE PROCEDURE [dbo].[LOAD_fact.Season]
+ALTER PROCEDURE [dbo].[LOAD_fact.Season]
 	-- Add the parameters for the stored procedure here
 AS
 BEGIN
@@ -27,10 +29,11 @@ BEGIN
 		G.[Season],
 		G.[gameType],
 		COUNT(G.[gameId]) OVER (PARTITION BY G.[season], G.[gameType]) AS [gameCount]
-
 	FROM
 		Game [G]	
 
+	WHERE
+		G.[detailedState] NOT IN ('Postponed', 'Cancelled')
 	ORDER BY G.[Season]
 END
 GO
