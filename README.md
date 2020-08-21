@@ -27,3 +27,20 @@ Script the database build from scratch to data load and validation
         - time meta data metrics? 
           - how long does it take to pull the records for a season
           - Incorperate non regular season games
+
+
+    Bring in Dimentions
+        Player
+            id
+            name
+            number
+            position
+
+        Team Names
+            id
+            name
+            league
+            division
+
+        Venue Names
+        Pitch Type Names
