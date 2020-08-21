@@ -3,6 +3,8 @@ Py proj to build a killer mlb db
 
 What to do next?
 
+Adding a comment to test git. 
+
 Script the database build from scratch to data load and validation
     - build the validation part
         1) Load Game Data for 1 Season
