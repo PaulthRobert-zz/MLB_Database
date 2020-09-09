@@ -52,7 +52,9 @@ def getPlayers(season):
             player = getPlayerDetails['player_info']['queryResults']['row']
             #print(player)
             firstName= player['name_first']
+            firstName = firstName.replace("'","''")
             lastName= player['name_last']
+            lastName = lastName.replace("'","''")
             jerseyNumber = player['jersey_number']
             weight = player['weight']
             heightFeet = player['height_feet']
@@ -61,7 +63,6 @@ def getPlayers(season):
             throws = player['throws']
             bats = player['bats']
             primaryPosition = player['primary_position']
-            print(playerId, firstName, lastName)
             
             # #build sql statement
             SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Player]"
