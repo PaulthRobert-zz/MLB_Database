@@ -36,8 +36,9 @@ def getPlayers(season):
     playerIds = playerIds.fetchall()
 
     for playerId in playerIds:
-        playerId = playerId['player_info']
-
+        playerId = playerId[0]
+        # test player id 519058
+        # print(playerId)
         # build the string to request the start and end dates for a season by game type
         getPlayerDetailsRequestString = f"http://lookup-service-prod.mlb.com/json/named.player_info.bam?sport_code='mlb'&player_id='{playerId}'"
 
@@ -48,25 +49,32 @@ def getPlayers(season):
         getPlayerDetails = getPlayerDetails.json()
 
         try: 
-            player = getPlayerDetails['player_info']
-            print(player)
-        #     # firstName= player['name_first']
-        #     # lastName= player['name_last']
-        #     print(playerId)
-           # print(playerId, firstName, lastName)
+            player = getPlayerDetails['player_info']['queryResults']['row']
+            #print(player)
+            firstName= player['name_first']
+            lastName= player['name_last']
+            jerseyNumber = player['jersey_number']
+            weight = player['weight']
+            heightFeet = player['height_feet']
+            heightInches = player['height_inches']
+            teamId = player['team_id']
+            throws = player['throws']
+            bats = player['bats']
+            primaryPosition = player['primary_position']
+            print(playerId, firstName, lastName)
             
             # #build sql statement
-            # SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Player]"
-            # "(playerId, firstName, lastName)"
-            # f'VALUES ({playerId}, \'{firstName}\', \'{lastName}\')')
+            SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Player]"
+            "(playerId, firstName, lastName, jerseyNumber, weight, heightFeet, heightInches, teamId, throws, bats, primaryPosition)"
+            f'VALUES ({playerId}, \'{firstName}\', \'{lastName}\',\'{jerseyNumber}\',{weight},{heightFeet},{heightInches},{teamId},\'{throws}\',\'{bats}\',\'{primaryPosition}\')')
 
-            # #print(SqlInsertStatement)
+            print(SqlInsertStatement)
             
             # #insert a record
-            # cursor.execute(SqlInsertStatement)
+            cursor.execute(SqlInsertStatement)
 
             # #without this it doesnt commit - giving you a chance to check the execution and confirm it worked,. Your can query before commit
-            # conn.commit()
+            conn.commit()
 
         except KeyError:
             #if there is a key error - if the key isn't present, dont push to db

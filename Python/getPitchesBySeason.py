@@ -54,7 +54,6 @@ def getPitches(season):
     # selectGameId = f'SELECT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]<2019 AND G.[season]>=2010'
     selectGameId = f'SELECT DISTINCT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]={season} AND detailedState NOT IN (\'Postponed\', \'Cancelled\')'
     
-
     # execute the sql statement
     games = cursor.execute(selectGameId)
     # get all rows from the sql return value
