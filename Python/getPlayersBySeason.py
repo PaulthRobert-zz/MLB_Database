@@ -39,10 +39,10 @@ def getPlayers(season):
         playerId = playerId[0]
         # test player id 519058
         # print(playerId)
-        # build the string to request the start and end dates for a season by game type
+        # build the string to request the player data by player id
         getPlayerDetailsRequestString = f"http://lookup-service-prod.mlb.com/json/named.player_info.bam?sport_code='mlb'&player_id='{playerId}'"
 
-        # get the game type dates 
+        # get the player details
         getPlayerDetails = requests.get(getPlayerDetailsRequestString)
 
         # format as json
@@ -69,7 +69,7 @@ def getPlayers(season):
             "(playerId, firstName, lastName, jerseyNumber, weight, heightFeet, heightInches, teamId, throws, bats, primaryPosition)"
             f'VALUES ({playerId}, \'{firstName}\', \'{lastName}\',\'{jerseyNumber}\',{weight},{heightFeet},{heightInches},{teamId},\'{throws}\',\'{bats}\',\'{primaryPosition}\')')
 
-            print(SqlInsertStatement)
+            #print(SqlInsertStatement)
             
             # #insert a record
             cursor.execute(SqlInsertStatement)
