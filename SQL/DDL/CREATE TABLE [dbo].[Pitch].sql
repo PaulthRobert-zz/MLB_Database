@@ -4,7 +4,9 @@ CREATE TABLE [MLB].[dbo].[Pitch](
 	[playId] varchar(100) NOT NULL,
 	[gameId] int NOT NULL,			--6 digits long
 	[pitcherId] int,				--6 digits long
-	[batterId] int,	
+	[batterId] int,
+	[atBatIndex] int,
+	[pitchNumber] int,	
 	--details
 	[isInPlay] varchar(10),
 	[isStrike] varchar(10),
@@ -19,7 +21,7 @@ CREATE TABLE [MLB].[dbo].[Pitch](
 	[endSpeed] decimal(5,2),
 	[strikeZoneTop] decimal(5,2),
 	[strikeZoneBottom] decimal(5,2),
-	--coordinates
+	--pitchData coordinates
 	[aY] decimal(5,2),
 	[aZ] decimal(5,2),
 	[pfxX] decimal(5,2),
@@ -53,8 +55,7 @@ CREATE TABLE [MLB].[dbo].[Pitch](
 	--hit Coordinates
 	[coordX] decimal(5,2),
 	[coordY] decimal(5,2),
-	[pitchNumber] int,
-	[atBatIndex] int
+
 
 ) ON [PRIMARY]
 

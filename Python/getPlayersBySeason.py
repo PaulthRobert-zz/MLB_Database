@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 import pyodbc
 
 # pandas is used for a bunch a cool stuff i think, i don't really know. here i want to use it to read the sql query results
-# define the database connection parameters
 import pandas
 
 # i think i need this one so that i can output the error messages in try catch
