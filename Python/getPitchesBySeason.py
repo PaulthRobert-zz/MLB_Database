@@ -103,6 +103,9 @@ def getPitches(season):
                 playStartTime = datetime.strptime(playStartTime,'%Y-%m-%dT%H:%M:%S.%fZ')
                 playEndTime = datetime.strptime(playEndTime,'%Y-%m-%dT%H:%M:%S.%fZ')
 
+                playStartTime = datetime.strftime(playStartTime, '%Y%m%d %H:%M:%S') 
+                playEndTime =  datetime.strftime(playEndTime, '%Y%m%d %H:%M:%S')
+
                 #result
                 resultType             = play['result']['type']
                 event                  = play['result']['event']
@@ -114,7 +117,7 @@ def getPitches(season):
                 # build insert statement for [dbo].[plateAppearances]
                 SqlInsertStatementPlateAppearance = ("INSERT INTO [MLB].[dbo].[PlateAppearance]"
                         "(GameId, halfInning, inning, atBatIndex, pitcherId, pitchHand, batterId, batSide, startTime, endTime, isScoringPlay, resultType, event, eventType, rbi, awayScore, homeScore)"
-                        f'VALUES ({gameId}, \'{halfInning}\',{inning},{atBatIndex},{pitcherId},\'{pitchHand}\',{batterId},\'{batSide}\',{playStartTime},{playEndTime},\'{isScoringPlay}\',\'{resultType}\',\'{event}\',\'{eventType}\',{rbi},{awayScore},{homeScore})')
+                        f'VALUES ({gameId}, \'{halfInning}\',{inning},{atBatIndex},{pitcherId},\'{pitchHand}\',{batterId},\'{batSide}\',\'{playStartTime}\',\'{playEndTime}\',\'{isScoringPlay}\',\'{resultType}\',\'{event}\',\'{eventType}\',{rbi},{awayScore},{homeScore})')
                                         #insert a record
                 print(SqlInsertStatementPlateAppearance)
                 cursor.execute(SqlInsertStatementPlateAppearance)

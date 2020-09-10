@@ -2,7 +2,7 @@ USE [MLB]
 DROP TABLE [MLB].[dbo].[PlateAppearance]
 CREATE TABLE [MLB].[dbo].[PlateAppearance](
 	[GameId] INT,
-	[halfInning NVARCHAR(7),
+	[halfInning] NVARCHAR(7),
 	[inning] INT,
 	[atBatIndex] INT,
 	[pitcherId] INT,
