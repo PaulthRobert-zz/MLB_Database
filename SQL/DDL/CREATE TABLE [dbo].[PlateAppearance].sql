@@ -13,7 +13,7 @@ CREATE TABLE [MLB].[dbo].[PlateAppearance](
 	[endTime] DATETIME,
 	[isScoringPlay] NVARCHAR(6),
 	[resultType] NVARCHAR(25),
-	[event] NVARCHAR(25),
+	[event] NVARCHAR(50),
 	[eventType] NVARCHAR(25),
 	[rbi] INT,
 	[awayScore] INT,
