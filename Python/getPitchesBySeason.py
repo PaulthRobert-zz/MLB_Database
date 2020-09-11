@@ -27,6 +27,9 @@ Once a game is complete, the full dataset for the game can be accessed with this
 # requests is used for calling APIs
 import requests
 
+# for date manipulation
+from datetime import datetime, timedelta
+
 # pyodbc is used for connecting to the database
 import pyodbc
 
@@ -54,6 +57,8 @@ def getPitches(season):
     # selectGameId = f'SELECT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]<2019 AND G.[season]>=2010'
     selectGameId = f'SELECT DISTINCT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]={season} AND detailedState NOT IN (\'Postponed\', \'Cancelled\')'
     
+    # use this for testing a single game load
+    # selectGameId = f'SELECT DISTINCT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]={season} AND detailedState NOT IN (\'Postponed\', \'Cancelled\') AND g.[gameId] = 566085'
 
     # execute the sql statement
     games = cursor.execute(selectGameId)
@@ -81,150 +86,150 @@ def getPitches(season):
 
         # loop through all the plays in the game
         for play in gameFeed['liveData']['plays']['allPlays']:
+            #print(play)
             try:
                 pitcherId               = play['matchup']['pitcher']['id'] 
+                pitchHand               = play['matchup']['pitchHand']['code']
                 batterId                = play['matchup']['batter']['id']
+                batSide                 = play['matchup']['batSide']['code']
                 atBatIndex              = play['atBatIndex']
+
+                #about
+                halfInning              = play['about']['halfInning']
+                inning                  = play['about']['inning']
+                playStartTime           = play['about']['startTime']
+                playEndTime             = play['about']['endTime']
+                isScoringPlay           = play['about']['isScoringPlay']
+
+                playStartTime = datetime.strptime(playStartTime,'%Y-%m-%dT%H:%M:%S.%fZ')
+                playEndTime = datetime.strptime(playEndTime,'%Y-%m-%dT%H:%M:%S.%fZ')
+
+                playStartTime = datetime.strftime(playStartTime, '%Y%m%d %H:%M:%S') 
+                playEndTime =  datetime.strftime(playEndTime, '%Y%m%d %H:%M:%S')
+
+                #result
+                resultType             = play['result']['type']
+                event                  = play['result']['event']
+                eventType              = play['result']['eventType']
+                rbi                    = play['result']['rbi']
+                awayScore              = play['result']['awayScore']
+                homeScore              = play['result']['homeScore']
+
+                # build insert statement for [dbo].[plateAppearances]
+                SqlInsertStatementPlateAppearance = ("INSERT INTO [MLB].[dbo].[PlateAppearance]"
+                        "(GameId, halfInning, inning, atBatIndex, pitcherId, pitchHand, batterId, batSide, startTime, endTime, isScoringPlay, resultType, event, eventType, rbi, awayScore, homeScore)"
+                        f'VALUES ({gameId}, \'{halfInning}\',{inning},{atBatIndex},{pitcherId},\'{pitchHand}\',{batterId},\'{batSide}\',\'{playStartTime}\',\'{playEndTime}\',\'{isScoringPlay}\',\'{resultType}\',\'{event}\',\'{eventType}\',{rbi},{awayScore},{homeScore})')
+                                        #insert a record
+                # print(SqlInsertStatementPlateAppearance)
+                cursor.execute(SqlInsertStatementPlateAppearance)
+
+                # #without this it doesnt commit - giving you a chance to check the execution and confirm it worked,. Your can query before commit
+                conn.commit()
+
                 # #loop through all the play events in each play node
                 for playEvent in play['playEvents']:
-                    playId              = playEvent['playId']
-                    # details
-                    isInPlay            = playEvent['details']['isInPlay']
-                    isStrike            = playEvent['details']['isStrike']
-                    isBall              = playEvent['details']['isBall']
-                    callCode            = playEvent['details']['call']['code']
-                    typeCode            = playEvent['details']['type']['code']
-                    # count
-                    countBalls          = playEvent['count']['balls']
-                    countStrikes        = playEvent['count']['strikes']
-                    # pitchData
-                    startSpeed          = playEvent['pitchData']['startSpeed']
-                    endSpeed            = playEvent['pitchData']['endSpeed']
-                    strikeZoneTop       = playEvent['pitchData']['strikeZoneTop']
-                    strikeZoneBottom    = playEvent['pitchData']['strikeZoneBottom']
-                    # pitchData coordinates
-                    aY                  = playEvent['pitchData']['coordinates']['aY']
-                    aZ                  = playEvent['pitchData']['coordinates']['aZ']
-                    pfxX                = playEvent['pitchData']['coordinates']['pfxX']
-                    pfxZ                = playEvent['pitchData']['coordinates']['pfxZ']
-                    pX                  = playEvent['pitchData']['coordinates']['pX']
-                    pZ                  = playEvent['pitchData']['coordinates']['pZ']
-                    vX0                 = playEvent['pitchData']['coordinates']['vX0']
-                    vY0                 = playEvent['pitchData']['coordinates']['vY0']
-                    vZ0                 = playEvent['pitchData']['coordinates']['vZ0']
-                    x                   = playEvent['pitchData']['coordinates']['x'] 
-                    y                   = playEvent['pitchData']['coordinates']['y']
-                    x0                  = playEvent['pitchData']['coordinates']['x0']
-                    y0                  = playEvent['pitchData']['coordinates']['y0']
-                    z0                  = playEvent['pitchData']['coordinates']['z0']
-                    aX                  = playEvent['pitchData']['coordinates']['aX']
-                    # breaks
-                    # LOOKOUT SOME OF THESE ELEMENTS ARE NOT PRESENT SOME TIME 
-                    # You are going to need to check for the presence of the element
-                    breakAngle          = playEvent['pitchData']['breaks']['breakAngle']
-        
-                    # #these arent present on the data set i am working with today - maybe they vary by ball park - depending on the equipment??
-                    # # breakLength         = playEvent['pitchData']['breaks']['breakLength']
-                    # # breakY              = playEvent['pitchData']['breaks']['breakY']
-                    # # spinRate            = playEvent['pitchData']['breaks']['spinRate']
-                    # # spinDirection       = playEvent['pitchData']['breaks']['spinDirection']
-                    # # zone                = playEvent['pitchData']['breaks']['zone']
-                    # # plateTime           = playEvent['pitchData']['breaks']['plateTime']
-                    
-                    # # hit data 
-                    # # #Check for the hit data node with a try catch
-                    try:
-                        launchSpeed         = playEvent['hitData']['launchSpeed']
-                        launchAngle         = playEvent['hitData']['launchAngle']
-                        totalDistance       = playEvent['hitData']['totalDistance']
-                        trajectory          = playEvent['hitData']['trajectory']
-                        hardness            = playEvent['hitData']['hardness']
-                        location            = playEvent['hitData']['location']
-                        # hit coordinates 
-                        coordX              = playEvent['hitData']['coordinates']['coordX']
-                        coordY              = playEvent['hitData']['coordinates']['coordY']
+                    # check for event type pitch 
+                    if playEvent['isPitch'] == True:
+                        playId              = playEvent['playId']
+                        # gameId
+                        # pitcherId
+                        # batterId
+                        # atBatIndex
                         pitchNumber         = playEvent['pitchNumber']
-                    except KeyError:
-                        launchSpeed         = 0
-                        launchAngle         = 0
-                        totalDistance       = 0
-                        trajectory          = 0
-                        hardness            = 0
-                        location            = 0
-                        # hit coordinates 
-                        coordX              = 0
-                        coordY              = 0
-                        pitchNumber         = 0
+                        # details
+                        isInPlay            = playEvent['details']['isInPlay']
+                        isStrike            = playEvent['details']['isStrike']
+                        isBall              = playEvent['details']['isBall']
+                        callCode            = playEvent['details']['call']['code']
+                        typeCode            = playEvent['details']['type']['code']
+                        # count
+                        countBalls          = playEvent['count']['balls']
+                        countStrikes        = playEvent['count']['strikes']
+                        # pitchData
+                        startSpeed          = playEvent['pitchData']['startSpeed']
+                        endSpeed            = playEvent['pitchData']['endSpeed']
+                        strikeZoneTop       = playEvent['pitchData']['strikeZoneTop']
+                        strikeZoneBottom    = playEvent['pitchData']['strikeZoneBottom']
+                        # pitchData coordinates
+                        aY                  = playEvent['pitchData']['coordinates']['aY']
+                        aZ                  = playEvent['pitchData']['coordinates']['aZ']
+                        pfxX                = playEvent['pitchData']['coordinates']['pfxX']
+                        pfxZ                = playEvent['pitchData']['coordinates']['pfxZ']
+                        pX                  = playEvent['pitchData']['coordinates']['pX']
+                        pZ                  = playEvent['pitchData']['coordinates']['pZ']
+                        vX0                 = playEvent['pitchData']['coordinates']['vX0']
+                        vY0                 = playEvent['pitchData']['coordinates']['vY0']
+                        vZ0                 = playEvent['pitchData']['coordinates']['vZ0']
+                        x                   = playEvent['pitchData']['coordinates']['x'] 
+                        y                   = playEvent['pitchData']['coordinates']['y']
+                        x0                  = playEvent['pitchData']['coordinates']['x0']
+                        y0                  = playEvent['pitchData']['coordinates']['y0']
+                        z0                  = playEvent['pitchData']['coordinates']['z0']
+                        aX                  = playEvent['pitchData']['coordinates']['aX']
+                        # breaks                                               
+                        try:
+                            breakAngle          = playEvent['pitchData']['breaks']['breakAngle']
+                        except:
+                            breakAngle          = 0
+                        try:
+                            breakLength         = playEvent['pitchData']['breaks']['breakLength']
+                        except:
+                            breakLength         = 0
+                        try:
+                            breakY              = playEvent['pitchData']['breaks']['breakY']
+                        except:
+                            breakY              = 0
+                        try:
+                            spinRate            = playEvent['pitchData']['breaks']['spinRate']
+                        except:
+                            spinRate            = 0
+                        try:
+                            spinDirection       = playEvent['pitchData']['breaks']['spinDirection']
+                        except:
+                            spinDirection       = 0
+                        try:
+                            zone                = playEvent['pitchData']['zone']
+                        except:
+                            zone                = 0    
+                        try:
+                            plateTime           = playEvent['pitchData']['plateTime']
+                        except:
+                            plateTime           = 0
+                        # hit data
+                        try:
+                            launchSpeed         = playEvent['hitData']['launchSpeed']
+                            launchAngle         = playEvent['hitData']['launchAngle']
+                            totalDistance       = playEvent['hitData']['totalDistance']
+                            trajectory          = playEvent['hitData']['trajectory']
+                            hardness            = playEvent['hitData']['hardness']
+                            location            = playEvent['hitData']['location']
+                            # hit coordinates 
+                            coordX              = playEvent['hitData']['coordinates']['coordX']
+                            coordY              = playEvent['hitData']['coordinates']['coordY']
+                        except KeyError:
+                            launchSpeed         = 0
+                            launchAngle         = 0
+                            totalDistance       = 0
+                            trajectory          = 0
+                            hardness            = 0
+                            location            = 0
+                            # hit coordinates 
+                            coordX              = 0
+                            coordY              = 0
+
+                        #build sql statement
+                        SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Pitch]"
+                        "(playId, gameId, pitcherId, batterId, atBatIndex, pitchNumber, isInPlay, isStrike, isBall, callCode, typeCode, countBalls, countStrikes, startSpeed, endSpeed, strikeZoneTop, strikeZoneBottom, aY, aZ, pfxX, pfxZ, pX, pZ, vX0, vY0, vZ0, x, y, x0, y0, z0, aX, breakAngle, breakLength, breakY, spinRate, spinDirection, zone, plateTime, launchSpeed, launchAngle, totalDistance, trajectory, hardness, location, coordX, coordY)"
+                        f'VALUES (\'{playId}\',{gameId},{pitcherId},{batterId},{atBatIndex},{pitchNumber},\'{isInPlay}\',\'{isStrike}\',\'{isBall}\',\'{callCode}\',\'{typeCode}\',{countBalls},{countStrikes},{startSpeed},{endSpeed},{strikeZoneTop},{strikeZoneBottom},{aY},{aZ},{pfxX},{pfxZ},{pX},{pZ},{vX0},{vY0},{vZ0},{x},{y},{x0},{y0},{z0},{aX},{breakAngle},{breakLength},{breakY},{spinRate},{spinDirection},{zone},{plateTime},{launchSpeed},{launchAngle},{totalDistance},\'{trajectory}\',\'{hardness}\',{location},{coordX},{coordY})')
+
+                        #print(SqlInsertStatement)
+                        
+                        #insert a record
+                        cursor.execute(SqlInsertStatement)
+
+                        # #without this it doesnt commit - giving you a chance to check the execution and confirm it worked,. Your can query before commit
+                        conn.commit()
                     
-                    # print(f"playId {playId}")   
-                    # print(f"gameId {gameId}")
-                    # print(f"pitcherId {pitcherId}")
-                    # print(f"batterId {batterId}")
-                    
-                    # # details
-                    # print(f"isInPlay {isInPlay}")
-                    # print(f"isStrike {isStrike}")
-                    # print(f"isBall {isBall}")
-                    # print(f"callCode {callCode}")
-                    # print(f"typeCode {typeCode}")
-
-                    # # count
-                    # print(f"countBalls {countBalls}")
-                    # print(f"countStrikes {countStrikes}")
-
-                    # # pitchData
-                    # print(f"startSpeed {startSpeed}")
-                    # print(f"endSpeed {endSpeed}")
-                    # print(f"strikeZoneTop {strikeZoneTop}")
-                    # print(f"strikeZoneBottom {strikeZoneBottom}")
-
-                    # # coordinates
-                    # print(f"aY {aY}")
-                    # print(f"aZ {aZ}")
-                    # print(f"pfxX {pfxX}")
-                    # print(f"pfxZ {pfxZ}")
-                    # print(f"pX {pX}")
-                    # print(f"pZ {pZ}")
-                    # print(f"vX0 {vX0}")
-                    # print(f"vY0 {vY0}")
-                    # print(f"vZ0 {vZ0}")
-                    # print(f"x {x}")
-                    # print(f"y {y}")
-                    # print(f"x0 {x0}")
-                    # print(f"y0 {y0}")
-                    # print(f"z0 {z0}")
-                    # print(f"aX {aX}")
-
-                    # # breaks
-                    # print(f"breakAngle {breakAngle}")
-                    
-                    # #hit data 
-                    # print(f"launchSpeed {launchSpeed}")
-                    # print(f"launchAngle {launchAngle}")
-                    # print(f"totalDistance {totalDistance}")
-                    # print(f"trajectory {trajectory}")
-                    # print(f"hardness {hardness}")
-                    # print(f"location {location}")
-
-                    # # hit coordinates 
-                    # print(f"coordX {coordX}")
-                    # print(f"coordY {coordY}")
-                    # print(f"pitchNumber {pitchNumber}")
-                    # print(f"atBatIndex {atBatIndex}")
-
-                    #build sql statement
-                    SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Pitch]"
-                    "(playId, gameId, pitcherId, batterId, isInPlay, isStrike, isBall, callCode, typeCode, countBalls, countStrikes, startSpeed, endSpeed, strikeZoneTop, strikeZoneBottom, aY, aZ, pfxX, pfxZ, pX, pZ, vX0, vY0, vZ0, x, y, x0, y0, z0, aX, breakAngle, launchSpeed, launchAngle, totalDistance, trajectory, hardness, location, coordX, coordY, pitchNumber, atBatIndex)"
-                    f'VALUES (\'{playId}\',{gameId},{pitcherId},{batterId},\'{isInPlay}\',\'{isStrike}\',\'{isBall}\',\'{callCode}\',\'{typeCode}\',{countBalls},{countStrikes},{startSpeed},{endSpeed},{strikeZoneTop},{strikeZoneBottom},{aY},{aZ},{pfxX},{pfxZ},{pX},{pZ},{vX0},{vY0},{vZ0},{x},{y},{x0},{y0},{z0},{aX},{breakAngle},{launchSpeed},{launchAngle},{totalDistance},\'{trajectory}\',\'{hardness}\',{location},{coordX},{coordY},{pitchNumber},{atBatIndex})')
-
-
-                    # print(SqlInsertStatement)
-                    
-                    #insert a record
-                    cursor.execute(SqlInsertStatement)
-
-                    # #without this it doesnt commit - giving you a chance to check the execution and confirm it worked,. Your can query before commit
-                    conn.commit()
             except KeyError:
                 #if there is a key error - if the key isn't present, dont push to db
                 print('Error', sys.exc_info()[0])

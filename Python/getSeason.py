@@ -1,8 +1,14 @@
-import getGameIdsBySeason, getPitchesBySeason
+import getGameIdsBySeason, getPitchesBySeason, getPlayersBySeason, getTeamsBySeason
 
-getGameIdsBySeason.getGames(2019,'R')
+Season = 2020
 
-getPitchesBySeason.getPitches(2019)
+getGameIdsBySeason.getGames(Season,'R')
+
+getPitchesBySeason.getPitches(Season)
+
+getPlayersBySeason.getPlayers(Season)
+
+getTeamsBySeason.getTeams(Season)
 
 # execute Load_fact.Season SP
 # execute Load_fact.

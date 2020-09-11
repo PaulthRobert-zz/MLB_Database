@@ -1,6 +1,7 @@
 --dbo
 --TRUNCATE TABLE Game
 --TRUNCATE TABLE Pitch
+--TRUNCATE TABLE Team
 
 --fact
 --TRUNCATE TABLE [fact].[Game]
