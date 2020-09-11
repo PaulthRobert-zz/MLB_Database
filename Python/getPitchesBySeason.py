@@ -218,11 +218,11 @@ def getPitches(season):
                             coordY              = 0
 
                         #build sql statement
-                        SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Pitch2]"
+                        SqlInsertStatement = ("INSERT INTO [MLB].[dbo].[Pitch]"
                         "(playId, gameId, pitcherId, batterId, atBatIndex, pitchNumber, isInPlay, isStrike, isBall, callCode, typeCode, countBalls, countStrikes, startSpeed, endSpeed, strikeZoneTop, strikeZoneBottom, aY, aZ, pfxX, pfxZ, pX, pZ, vX0, vY0, vZ0, x, y, x0, y0, z0, aX, breakAngle, breakLength, breakY, spinRate, spinDirection, zone, plateTime, launchSpeed, launchAngle, totalDistance, trajectory, hardness, location, coordX, coordY)"
                         f'VALUES (\'{playId}\',{gameId},{pitcherId},{batterId},{atBatIndex},{pitchNumber},\'{isInPlay}\',\'{isStrike}\',\'{isBall}\',\'{callCode}\',\'{typeCode}\',{countBalls},{countStrikes},{startSpeed},{endSpeed},{strikeZoneTop},{strikeZoneBottom},{aY},{aZ},{pfxX},{pfxZ},{pX},{pZ},{vX0},{vY0},{vZ0},{x},{y},{x0},{y0},{z0},{aX},{breakAngle},{breakLength},{breakY},{spinRate},{spinDirection},{zone},{plateTime},{launchSpeed},{launchAngle},{totalDistance},\'{trajectory}\',\'{hardness}\',{location},{coordX},{coordY})')
 
-                        #  print(SqlInsertStatement)
+                        #print(SqlInsertStatement)
                         
                         #insert a record
                         cursor.execute(SqlInsertStatement)
