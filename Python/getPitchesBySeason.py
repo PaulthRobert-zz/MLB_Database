@@ -188,11 +188,11 @@ def getPitches(season):
                         except:
                             spinDirection       = 0
                         try:
-                            zone                = playEvent['pitchData']['breaks']['zone']
+                            zone                = playEvent['pitchData']['zone']
                         except:
                             zone                = 0    
                         try:
-                            plateTime           = playEvent['pitchData']['breaks']['plateTime']
+                            plateTime           = playEvent['pitchData']['plateTime']
                         except:
                             plateTime           = 0
                         # hit data

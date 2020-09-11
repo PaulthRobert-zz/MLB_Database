@@ -1,6 +1,6 @@
 import getGameIdsBySeason, getPitchesBySeason, getPlayersBySeason, getTeamsBySeason
 
-Season = 2019
+Season = 2020
 
 getGameIdsBySeason.getGames(Season,'R')
 

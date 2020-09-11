@@ -14,7 +14,7 @@ CREATE TABLE [MLB].[dbo].[PlateAppearance](
 	[isScoringPlay] NVARCHAR(6),
 	[resultType] NVARCHAR(25),
 	[event] NVARCHAR(50),
-	[eventType] NVARCHAR(25),
+	[eventType] NVARCHAR(50),
 	[rbi] INT,
 	[awayScore] INT,
 	[homeScore] INT
