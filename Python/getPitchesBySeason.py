@@ -55,9 +55,10 @@ def getPitches(season):
 
     # build select statement
     # selectGameId = f'SELECT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]<2019 AND G.[season]>=2010'
-    # selectGameId = f'SELECT DISTINCT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]={season} AND detailedState NOT IN (\'Postponed\', \'Cancelled\')'
+    selectGameId = f'SELECT DISTINCT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]={season} AND detailedState NOT IN (\'Postponed\', \'Cancelled\')'
     
-    selectGameId = f'SELECT DISTINCT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]={season} AND detailedState NOT IN (\'Postponed\', \'Cancelled\') AND g.[gameId] = 566085'
+    # use this for testing a single game load
+    # selectGameId = f'SELECT DISTINCT G.[gameId] FROM [MLB].[dbo].[Game] G WHERE G.[season]={season} AND detailedState NOT IN (\'Postponed\', \'Cancelled\') AND g.[gameId] = 566085'
 
     # execute the sql statement
     games = cursor.execute(selectGameId)
@@ -119,7 +120,7 @@ def getPitches(season):
                         "(GameId, halfInning, inning, atBatIndex, pitcherId, pitchHand, batterId, batSide, startTime, endTime, isScoringPlay, resultType, event, eventType, rbi, awayScore, homeScore)"
                         f'VALUES ({gameId}, \'{halfInning}\',{inning},{atBatIndex},{pitcherId},\'{pitchHand}\',{batterId},\'{batSide}\',\'{playStartTime}\',\'{playEndTime}\',\'{isScoringPlay}\',\'{resultType}\',\'{event}\',\'{eventType}\',{rbi},{awayScore},{homeScore})')
                                         #insert a record
-                print(SqlInsertStatementPlateAppearance)
+                # print(SqlInsertStatementPlateAppearance)
                 cursor.execute(SqlInsertStatementPlateAppearance)
 
                 # #without this it doesnt commit - giving you a chance to check the execution and confirm it worked,. Your can query before commit
@@ -167,19 +168,32 @@ def getPitches(season):
                         aX                  = playEvent['pitchData']['coordinates']['aX']
                         # breaks                                               
                         try:
-                            breakAngle          = playEvent['pitchData']['breaks']['breakAngle']                            
+                            breakAngle          = playEvent['pitchData']['breaks']['breakAngle']
+                        except:
+                            breakAngle          = 0
+                        try:
                             breakLength         = playEvent['pitchData']['breaks']['breakLength']
-                            breakY              = playEvent['pitchData']['breaks']['breakY']
-                            spinRate            = playEvent['pitchData']['breaks']['spinRate']
-                            spinDirection       = playEvent['pitchData']['breaks']['spinDirection']
-                            zone                = playEvent['pitchData']['breaks']['zone']
-                            plateTime           = playEvent['pitchData']['breaks']['plateTime']
                         except:
                             breakLength         = 0
+                        try:
+                            breakY              = playEvent['pitchData']['breaks']['breakY']
+                        except:
                             breakY              = 0
+                        try:
+                            spinRate            = playEvent['pitchData']['breaks']['spinRate']
+                        except:
                             spinRate            = 0
+                        try:
+                            spinDirection       = playEvent['pitchData']['breaks']['spinDirection']
+                        except:
                             spinDirection       = 0
-                            zone                = 0
+                        try:
+                            zone                = playEvent['pitchData']['breaks']['zone']
+                        except:
+                            zone                = 0    
+                        try:
+                            plateTime           = playEvent['pitchData']['breaks']['plateTime']
+                        except:
                             plateTime           = 0
                         # hit data
                         try:
@@ -208,7 +222,7 @@ def getPitches(season):
                         "(playId, gameId, pitcherId, batterId, atBatIndex, pitchNumber, isInPlay, isStrike, isBall, callCode, typeCode, countBalls, countStrikes, startSpeed, endSpeed, strikeZoneTop, strikeZoneBottom, aY, aZ, pfxX, pfxZ, pX, pZ, vX0, vY0, vZ0, x, y, x0, y0, z0, aX, breakAngle, breakLength, breakY, spinRate, spinDirection, zone, plateTime, launchSpeed, launchAngle, totalDistance, trajectory, hardness, location, coordX, coordY)"
                         f'VALUES (\'{playId}\',{gameId},{pitcherId},{batterId},{atBatIndex},{pitchNumber},\'{isInPlay}\',\'{isStrike}\',\'{isBall}\',\'{callCode}\',\'{typeCode}\',{countBalls},{countStrikes},{startSpeed},{endSpeed},{strikeZoneTop},{strikeZoneBottom},{aY},{aZ},{pfxX},{pfxZ},{pX},{pZ},{vX0},{vY0},{vZ0},{x},{y},{x0},{y0},{z0},{aX},{breakAngle},{breakLength},{breakY},{spinRate},{spinDirection},{zone},{plateTime},{launchSpeed},{launchAngle},{totalDistance},\'{trajectory}\',\'{hardness}\',{location},{coordX},{coordY})')
 
-                        print(SqlInsertStatement)
+                        #  print(SqlInsertStatement)
                         
                         #insert a record
                         cursor.execute(SqlInsertStatement)
