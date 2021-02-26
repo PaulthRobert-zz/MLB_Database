@@ -2,7 +2,7 @@
 Write a sp that lets you pass 
 	PlayerId Pitcher (pitchers only)
 	GameId
-
+	
 	Return 
 
 
@@ -11,17 +11,34 @@ Write a sp that lets you pass
 	Pitcher Career Stats Summary
 														-- Season '21 --	--Season '20 --		-- Season '19 --	-- Career --
 		G    - Games
+			Sum of games where pitches thrown> 0
+
 		GS   - Games Started
+			Sum of games where atBatIntex 0 pitcherId = @pitcherId
+
 		IP   - Innings Pitched
+			Count of innings where pitchesThrown > 0
 
 		K/9  - Strikeouts per 9 innings
+			Grain: Season 
+
 		BB/9 - Walks per 9 innings
+			Grain: Season
+
 		K/BB - Strikeout to Walk Ratio
+			Grain: Season
 		HR/9 - Home Runs  per 9 innings
+			Grain: Season
+
 		K%   - Strikeout Percentage
+			Grain: Season
 		BB%  - Walk Percentage
+			Grain: Season
 		K%-BB% - Strikout Percentage - Walk Percentage
-		WHIP - Walks Plus Hits per Inning Pitched
+			Grain: Season
+
+		WHIP - Walks Plus Hits per Innings Pitched
+			Sum(Walks) + Sum(InningsPitched)
 
 		BABIP - Batting Average on Balls in Play
 
