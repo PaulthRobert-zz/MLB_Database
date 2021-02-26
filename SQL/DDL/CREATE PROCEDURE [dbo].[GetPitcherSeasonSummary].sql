@@ -61,18 +61,21 @@ GO
 
 
 
-CREATE PROCEDURE [dbo].[GetPitcherSeasonSummary]
-	@Season NVARCHAR(MAX)
+--CREATE PROCEDURE [dbo].[GetPitcherSeasonSummary]
+--	@Season NVARCHAR(MAX)
 
-AS
+--AS
 
 BEGIN
 
---DECLARE 
---	@Season NVARCHAR(MAX) = '2020'
+DECLARE 
+	@Season NVARCHAR(MAX) = '2019'
 
 SELECT
 	 T1.[season]
+	,T1.[league]
+	,T1.[division]
+	,T1.[TeamName]
 	,T1.[playerId]
 	,T1.[PitcherFirstName]
 	,T1.[PitcherLastName]
@@ -107,9 +110,13 @@ FROM
 	(
 	SELECT
 		 G.[season]
+		,PT.[name]	AS [TeamName]
+		,PT.[league]
+		,PT.[division]
 		,PIT.[playerId]
-		,PIT.[firstName] AS [PitcherFirstName]
 		,PIT.[lastName] AS [PitcherLastName]
+		,PIT.[firstName] AS [PitcherFirstName]
+		,PIT.[jerseyNumber]
 		,PA.[pitchHand]
 		,PA.[GameId]
 		,G.[homeTeam]
@@ -170,6 +177,10 @@ FROM
 		LEFT JOIN [MLB].[dbo].[Team] HT ON G.[homeTeam] = HT.[teamId]				-- Home Team
 		
 		LEFT JOIN [MLB].[dbo].[Team] AT ON G.[awayTeam] = AT.teamId					-- Away Team
+
+		LEFT JOIN [MLB].[dbo].[Team] PT ON PIT.[teamId] = PT.[teamId]				-- Pitcher Team
+
+		LEFT JOIN [MLB].[dbo].[Team] BT ON BAT.teamId = BT.[teamId]					-- Batter Team
 		
 	WHERE
 		PIT.[primaryPosition] = '1' -- player is a pitcher
@@ -185,9 +196,21 @@ FROM
 
 	GROUP BY
 	 T1.[season]
+	,T1.[league]
+	,T1.[division]
+	,T1.[TeamName]
 	,T1.[playerId]
 	,T1.[PitcherFirstName]
 	,T1.[PitcherLastName]
+
+	ORDER BY
+		T1.season
+		, T1.[league]
+		, T1.[division]
+		, T1.[TeamName]
+		, T1.[PitcherLastName]
+
+		
 
 
 
